@@ -1,0 +1,21 @@
+{
+  "name": "dedede",
+  "version": "0.1.0",
+  "description": "Destiny Definitions Downloader",
+  "keywords": ["destiny", "api", "manifest", "definitions"],
+  "main": "main.js",
+  "author": "Jonathan Rajavuori <jrajav@gmail.com>",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jrajav/dedede"
+  },
+  "dependencies": {
+    "jsonfile": "^2.0.0",
+    "restler": "^3.2.2",
+    "sql.js": "^0.2.21",
+    "stream-to-array": "^2.0.2",
+    "streamifier": "^0.1.1",
+    "unzip": "^0.1.11"
+  }
+}
