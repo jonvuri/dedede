@@ -3,6 +3,7 @@
 To retrieve the Destiny API definitions, run:
 
 ```
+npm install
 node main.js
 ```
 
