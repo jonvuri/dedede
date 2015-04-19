@@ -1,3 +1,10 @@
 # Destiny Definitions Downloader
 
-Run with `node main.js` to retrieve the Destiny API definitions. Writes to `./definitions.json` by default - modify `resultFile` to change.
+To retrieve the Destiny API definitions, run:
+
+```
+npm install
+node main.js
+```
+
+The definitions get written to ./definitions.json by default. Modify the `resultFile` variable to change where they go.
