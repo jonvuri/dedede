@@ -4,7 +4,8 @@ To retrieve the Destiny API definitions, run:
 
 ```
 npm install
-node main.js
+node download.js # Gets definitions.json
+node parse.js # Parses all tables into parsed.json
 ```
 
-The definitions get written to ./definitions.json by default. Modify the `resultFile` variable to change where they go.
+Modify the `resultFile` variable to change destination.
