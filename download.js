@@ -12,13 +12,14 @@ var manifestUrl = bungieUrl + '/platform/Destiny/Manifest/'
 var manifestLanguage = 'en'  // 'en', 'fr', 'es', 'de', 'it', 'ja', 'pt-br'
 
 var result = {}
-var resultFile = './definitions.json'
+var definitionsFile = 'in/definitions.json'
+var assetsFile = 'in/assets.json'
 
 
 
 function getCurrentDefinitions( callback ) {
 
-  jsonfile.readFile( resultFile, { encoding: 'utf8' }, function ( error, json ) {
+  jsonfile.readFile( definitionsFile, { encoding: 'utf8' }, function ( error, json ) {
     callback( null, json )
   } )
 
@@ -61,7 +62,7 @@ function getCurrentDefinitions( callback ) {
 ***/
 function getManifest( callback ) {
 
-  rest.get( manifestUrl ).on( 'success', function ( responseBody ) {
+  rest.get( manifestUrl, { headers: { 'X-API-Key': 'YOUR-API-KEY' } } ).on( 'success', function ( responseBody ) {
 
     callback( null, responseBody )
 
@@ -90,6 +91,9 @@ async.parallel([
 
   var currentDefinitions = results[0]
   var manifest = results[1].Response
+
+  var util = require('util')
+  console.log( 'Got response: ' + util.inspect(results[1], { depth: 8, colors: true }))
 
   console.log( 'Got manifest version: ' + manifest.version )
 
@@ -131,8 +135,46 @@ async.parallel([
 
             })
 
-            jsonfile.writeFileSync( resultFile, result )
-            console.log( 'Wrote definitions to ' + resultFile )
+            result.Manifest = manifest
+
+            jsonfile.writeFileSync( definitionsFile, result )
+            console.log( 'Wrote definitions to ' + definitionsFile )
+
+          })
+
+        })
+
+    })
+
+
+    var assetsUrl = bungieUrl + manifest.mobileGearAssetDataBases.find(d => d.version === 2).path
+
+    rest.get( assetsUrl ).on( 'success', function (_, response) {
+
+      console.log( 'Got asset database' )
+
+      streamifier.createReadStream( response.raw )
+        .pipe( unzip.Parse() )
+        .on( 'entry', function (entry) {
+
+          toArray( entry, function (_, array) {
+
+            var db = new sql.Database( new Uint8Array( Buffer.concat(array) ) )
+
+            console.log( 'Database loaded' )
+
+            var rows = db.exec( 'SELECT id, json FROM DestinyGearAssetsDefinition')[0].values
+
+            var result = {}
+
+            rows.forEach(function (row) {
+              var id = row[0]
+              id >>>= 0
+              result[id] = JSON.parse(row[1])
+            })
+
+            jsonfile.writeFileSync( assetsFile, result )
+            console.log( 'Wrote assets to ' + assetsFile )
 
           })
 

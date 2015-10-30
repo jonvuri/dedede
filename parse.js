@@ -3,8 +3,14 @@ var fs = require('fs')
 var jsonfile = require('jsonfile')
 
 
-var definitionsFile = './definitions.json'
-var resultFile = './parsed.json'
+var definitionsFile = 'in/definitions.json'
+var assetsFile = 'in/assets.json'
+
+
+// For jsonfile.writeFile
+//var resultFile = './parsed.json'
+var definitionsJsFile = 'out/definitions.js'
+var assetsJsFile = 'out/assets.js'
 
 
 // Categories that are not simple lists with hash properties:
@@ -48,11 +54,7 @@ function flattenObjects( objects, key ) {
 
 	return objects.reduce( function ( result, object ) {
 
-		var objectKey = object[key]
-
-		delete object[key]
-
-		result[ objectKey ] = object
+		result[ object[key] ] = object
 
 		return result
 
@@ -78,12 +80,38 @@ function mergeObjects() {
 
 jsonfile.readFile( definitionsFile, function ( error, definitions ) {
 
-	jsonfile.writeFile(
-		resultFile,
-		mergeObjects(
-			flattenObjects( definitions.DestinyClassDefinition, hashKeys.DestinyClassDefinition ),
-			flattenObjects( definitions.DestinyRaceDefinition, hashKeys.DestinyRaceDefinition )
-		)
+	// jsonfile.writeFile(
+	// 	resultFile,
+	// 	mergeObjects(
+	// 		flattenObjects( definitions.DestinyInventoryItemDefinition, hashKeys.DestinyInventoryItemDefinition ),
+	// 		flattenObjects( definitions.DestinyClassDefinition, hashKeys.DestinyClassDefinition ),
+	// 		flattenObjects( definitions.DestinyGenderDefinition, hashKeys.DestinyGenderDefinition ),
+	// 		flattenObjects( definitions.DestinyRaceDefinition, hashKeys.DestinyRaceDefinition ),
+			
+	// 		flattenObjects( definitions.DestinySandboxPerkDefinition, hashKeys.DestinySandboxPerkDefinition ),
+	// 		flattenObjects( definitions.DestinyStatDefinition, hashKeys.DestinyStatDefinition )
+	// 	)
+	// )
+
+	var object = mergeObjects(
+		flattenObjects( definitions.DestinyInventoryItemDefinition, hashKeys.DestinyInventoryItemDefinition ),
+		flattenObjects( definitions.DestinyClassDefinition, hashKeys.DestinyClassDefinition ),
+		flattenObjects( definitions.DestinyGenderDefinition, hashKeys.DestinyGenderDefinition ),
+		flattenObjects( definitions.DestinyRaceDefinition, hashKeys.DestinyRaceDefinition ),
+		flattenObjects( definitions.DestinySandboxPerkDefinition, hashKeys.DestinySandboxPerkDefinition ),
+		flattenObjects( definitions.DestinyStatDefinition, hashKeys.DestinyStatDefinition )
 	)
+
+	fs.writeFile(definitionsJsFile, 'var DEFINITIONS = ' + JSON.stringify(object) + ';\n', function () {
+		console.log('Wrote definitions to ' + definitionsJsFile)
+	})
+
+} )
+
+jsonfile.readFile( assetsFile, function ( error, assets ) {
+
+	fs.writeFile(assetsJsFile, 'var ASSETS = ' + JSON.stringify(assets) + ';\n', function () {
+		console.log('Wrote assets to ' + assetsJsFile)
+	})
 
 } )
